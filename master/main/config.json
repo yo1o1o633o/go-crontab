@@ -1,0 +1,8 @@
+{
+  "apiPort": 9100,
+  "apiReadTimeout": 5000,
+  "apiWriteTimeout": 5000,
+
+  "etcdEndpoints": [""],
+  "etcdDialTimeout": 5000
+}
