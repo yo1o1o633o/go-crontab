@@ -3,9 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/yo1o1o633o/go-crontab/common"
 	"github.com/yo1o1o633o/go-crontab/master"
 	"runtime"
+	"time"
 )
 
 var configFile string
@@ -29,7 +29,7 @@ func main() {
 		goto ERR
 	}
 
-	if err = common.InitJobMgr(); err != nil {
+	if err = master.InitJobMgr(); err != nil {
 		goto ERR
 	}
 
@@ -37,6 +37,9 @@ func main() {
 		goto ERR
 	}
 
+	for {
+		time.Sleep(1)
+	}
 	ERR:
 		fmt.Println(err)
 }
