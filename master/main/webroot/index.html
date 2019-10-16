@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GO分布式Crontab</title>
+    <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
+    <script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="page-header">
+                    <h1>管理后台<small>Golang分布式Crontab</small></h1>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <button type="button" class="btn btn-primary">新建任务</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>任务名称</th>
+                                    <th>Shell命令</th>
+                                    <th>cron表达式</th>
+                                    <th>任务操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Job1</td>
+                                    <td>echo hello</td>
+                                    <td>* * * * * *</td>
+                                    <td>
+                                        <div class="btn-toolbar">
+                                            <button class="btn btn-info">编辑</button>
+                                            <button class="btn btn-danger">删除</button>
+                                            <button class="btn btn-warning">强杀</button>
+                                            <button class="btn btn-warning">日志</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<script>
+    $(function(){
+        $(".btn-info").click(function(res){
+            alert("编辑")
+        })
+        $(".btn-danger").click(function(res){
+            alert("删除")
+        })
+        $(".btn-warning").click(function(res){
+            alert("强杀")
+        })
+        // $.ajax({
+        //     url: "/jobs/list",
+        //     dataType: "json",
+        //     success: function(res) {
+        //         if (res.errno != 200) {
+        //             return
+        //         }
+        //         var jobList = res.data
+        //         for (var i = 0; i < jobList.length; i++) {
+        //             var job = jobList[i]
+        //             var tr = $("<tr>")
+        //             tr.append($("<td>").html(job.name))
+        //             tr.append($("<td>").html(job.command))
+        //             tr.append($("<td>").html(job.cronExpr))
+        //             var toolBar = $("<div class='btn-toolbar'>").append('<button class="btn btn-info">编辑</button>')
+        //                                                         .append('<button class="btn btn-danger">删除</button>')
+        //                                                         .append('<button class="btn btn-warning">强杀</button>')
+        //                                                         .append('<button class="btn btn-warning">日志</button>')
+        //             tr.append($('<tr>')).append(toolBar)
+        //             $("tbody").append(tr)
+        //         }
+        //     }
+        // })
+        $.ajax({
+            url: "/jobs/save",
+            data: {"name": "job1", "command":"ooo", "cronExpr": "ddd"},
+            dataType: "json",
+            success: function(res) {
+                if (res.errno !== 200) {
+                    return
+                }
+            }
+        })
+    })
+</script>
+</body>
+</html>

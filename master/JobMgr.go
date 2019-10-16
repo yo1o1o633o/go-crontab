@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/yo1o1o633o/go-crontab/common"
 	"go.etcd.io/etcd/clientv3"
+	"go.etcd.io/etcd/mvcc/mvccpb"
 	"time"
 )
 
@@ -56,7 +57,7 @@ func (JobMgr *JobMgr) SaveJob(job *common.Job) (oldJob *common.Job, err error) {
 		oldJobObj common.Job
 	)
 	// 保存到etcd中的任务的key
-	jobKey = "/cron/jobs/" + job.Name
+	jobKey = common.JOB_SAVE_DIR + job.Name
 	// 将任务信息job结构体数据序列化成json
 	if jobValue, err = json.Marshal(job); err != nil {
 		return
@@ -84,7 +85,7 @@ func (JobMgr *JobMgr) DeleteJob(name string) (oldJob *common.Job, err error) {
 		oldJobObj common.Job
 	)
 	// 拼接key
-	jobKey = "/cron/jobs/" + name
+	jobKey = common.JOB_SAVE_DIR + name
 
 	if delResp, err = JobMgr.kv.Delete(context.TODO(), jobKey, clientv3.WithPrevKV()); err != nil {
 		return
@@ -95,6 +96,50 @@ func (JobMgr *JobMgr) DeleteJob(name string) (oldJob *common.Job, err error) {
 			return
 		}
 		oldJob = &oldJobObj
+	}
+	return
+}
+
+// 任务列表
+func (JobMgr *JobMgr) ListJob() (jobList []*common.Job, err error) {
+	var (
+		jobKey string
+		getResp *clientv3.GetResponse
+		kvPair *mvccpb.KeyValue
+		job *common.Job
+	)
+	jobKey = common.JOB_SAVE_DIR
+	if getResp, err = JobMgr.kv.Get(context.TODO(), jobKey, clientv3.WithPrefix()); err != nil {
+		return
+	}
+
+	// 初始化数组空间
+	jobList = make([]*common.Job, 0)
+
+	for _, kvPair = range getResp.Kvs {
+		job = &common.Job{}
+		if err = json.Unmarshal(kvPair.Value, job); err != nil {
+			continue
+		}
+		// 要重新给jobList赋值, 因为当数组空间发生变化时, 内存会重新分配
+		jobList = append(jobList, job)
+	}
+	return
+}
+
+// 杀死任务
+func (JobMgr *JobMgr) killJob(name string) (err error) {
+	var (
+		killKey string
+		lease *clientv3.LeaseGrantResponse
+	)
+	killKey = "/cron/jobs/" + name
+
+	if lease, err = JobMgr.lease.Grant(context.TODO(), 1); err != nil {
+		return
+	}
+	if _, err = JobMgr.kv.Put(context.TODO(), killKey,"", clientv3.WithLease(lease.ID)); err != nil {
+		return
 	}
 	return
 }
