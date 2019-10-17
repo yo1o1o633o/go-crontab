@@ -3,6 +3,6 @@
   "apiReadTimeout": 5000,
   "apiWriteTimeout": 5000,
 
-  "etcdEndpoints": ["192.168.126.128:2379"],
+  "etcdEndpoints": ["120.55.62.113:2379"],
   "etcdDialTimeout": 5000
 }

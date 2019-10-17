@@ -2,6 +2,7 @@ package master
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/yo1o1o633o/go-crontab/common"
 	"net"
 	"net/http"
@@ -31,7 +32,7 @@ func InitApiServer() (err error){
 	mux.HandleFunc("/jobs/list", handleJobList)
 	mux.HandleFunc("/jobs/kill", handleJobKill)
 
-	staticDir = http.Dir("E:/project/src/github.com/yo1o1o633o/go-crontab/master/main/webroot")
+	staticDir = http.Dir("F:/goProject/src/github.com/yo1o1o633o/go-crontab/master/main/webroot")
 	staticHandler = http.FileServer(staticDir)
 	mux.Handle("/", http.StripPrefix("/", staticHandler))
 
@@ -128,13 +129,14 @@ func handleJobList(w http.ResponseWriter, r *http.Request) {
 		res []byte
 	)
 	if jobList, err = G_jobMgr.ListJob(); err != nil {
+		fmt.Println(err)
 		goto ERR
 	}
 	if res, err = common.BuildResponse(200, "success", jobList); err == nil {
 		w.Write(res)
 	}
 	ERR:
-		if res, err = common.BuildResponse(10000, err.Error(), nil); err == nil {
+		if res, err = common.BuildResponse(10000, err.Error(), ""); err == nil {
 			w.Write(res)
 		}
 }
