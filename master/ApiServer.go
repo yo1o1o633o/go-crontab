@@ -32,7 +32,7 @@ func InitApiServer() (err error){
 	mux.HandleFunc("/jobs/list", handleJobList)
 	mux.HandleFunc("/jobs/kill", handleJobKill)
 
-	staticDir = http.Dir("F:/goProject/src/github.com/yo1o1o633o/go-crontab/master/main/webroot")
+	staticDir = http.Dir("E:/project/src/github.com/yo1o1o633o/go-crontab/master/main/webroot")
 	staticHandler = http.FileServer(staticDir)
 	mux.Handle("/", http.StripPrefix("/", staticHandler))
 
@@ -69,10 +69,8 @@ func handleJobSave(w http.ResponseWriter, r *http.Request) {
 	if err = r.ParseForm(); err != nil {
 		goto ERR
 	}
-
 	// 获取入参job字段
 	postJob = r.PostForm.Get("job")
-
 	// 反序列化入参,入参是json格式, 反序列到job结构体中保存
 	if err = json.Unmarshal([]byte(postJob), &job); err != nil {
 		goto ERR
@@ -82,12 +80,11 @@ func handleJobSave(w http.ResponseWriter, r *http.Request) {
 	if oldJob, err = G_jobMgr.SaveJob(&job); err != nil {
 		goto ERR
 	}
-
 	// 返回成功
 	if res, err = common.BuildResponse(200, "success", oldJob); err == nil {
 		w.Write(res)
 	}
-
+	return
 	ERR:
 		// 返回异常
 		if res, err = common.BuildResponse(10000, err.Error(), nil); err == nil {
@@ -116,6 +113,7 @@ func handleJobDelete(w http.ResponseWriter, r *http.Request) {
 	if res, err = common.BuildResponse(200, "success", oldJob); err == nil {
 		w.Write(res)
 	}
+	return
 	ERR:
 		if res, err = common.BuildResponse(10000, err.Error(), nil); err == nil {
 			w.Write(res)
@@ -135,6 +133,7 @@ func handleJobList(w http.ResponseWriter, r *http.Request) {
 	if res, err = common.BuildResponse(200, "success", jobList); err == nil {
 		w.Write(res)
 	}
+	return
 	ERR:
 		if res, err = common.BuildResponse(10000, err.Error(), ""); err == nil {
 			w.Write(res)
@@ -158,6 +157,7 @@ func handleJobKill(w http.ResponseWriter, r *http.Request) {
 	if res, err = common.BuildResponse(200, "success", nil); err == nil {
 		w.Write(res)
 	}
+	return
 	ERR:
 		if res, err = common.BuildResponse(10000, err.Error(), nil); err != nil {
 			w.Write(res)

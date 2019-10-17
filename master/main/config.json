@@ -1,5 +1,5 @@
 {
-  "apiPort": 9100,
+  "apiPort": 9102,
   "apiReadTimeout": 5000,
   "apiWriteTimeout": 5000,
 
