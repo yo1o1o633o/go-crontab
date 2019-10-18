@@ -18,7 +18,7 @@
         </div>
         <div class="row">
             <div class="col-md-12">
-                <button type="button" class="btn btn-primary">新建任务</button>
+                <button type="button" class="btn btn-primary create">新建任务</button>
             </div>
         </div>
         <div class="row">
@@ -35,19 +35,6 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>Job1</td>
-                                    <td>echo hello</td>
-                                    <td>* * * * * *</td>
-                                    <td>
-                                        <div class="btn-toolbar">
-                                            <button class="btn btn-info">编辑</button>
-                                            <button class="btn btn-danger">删除</button>
-                                            <button class="btn btn-warning">强杀</button>
-                                            <button class="btn btn-warning">日志</button>
-                                        </div>
-                                    </td>
-                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -55,49 +42,103 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="identifier">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- 模态框头部 -->
+                <div class="modal-header">
+                    <h4 class="modal-title">创建任务</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- 模态框主体 -->
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="email">任务名称:</label>
+                            <input type="email" class="form-control" id="name">
+                        </div>
+                        <div class="form-group">
+                            <label for="pwd">任务命令:</label>
+                            <input type="password" class="form-control" id="command">
+                        </div>
+                        <div class="form-group">
+                            <label for="pwd">Shell命令:</label>
+                            <input type="password" class="form-control" id="cronExpr">
+                        </div>
+                    </form>
+                </div>
+
+                <!-- 模态框底部 -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary subForm">提交</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
 <script>
     $(function(){
-        $(".btn-info").click(function(res){
-            alert("编辑")
+        $.get("/jobs/list", function(result) {
+            if (result.errno === 200) {
+                var data = result.data
+                var content = ""
+                for (var i = 0; i < data.length; i++) {
+                    res = data[i]
+                    content += '<tr><td>'+res.name+'</td><td>'+res.command+'</td> <td>'+res.cronExpr+'</td> <td>'
+                    content += '<div class="btn-toolbar"><button class="btn btn-info" data="'+res.name+'">编辑</button>'
+                    content += '<button class="btn btn-danger" data="'+res.name+'">删除</button>'
+                    content += '<button class="btn btn-warning" data="'+res.name+'">强杀</button>'
+                    content += '<button class="btn btn-warning" data="'+res.name+'">日志</button></div></td></tr>'
+                }
+                $("tbody").append(content)
+            }
+        }, 'json')
+
+        $("tbody").on("click", " .btn-info", function(){
+            $('#identifier').modal('show')
         })
-        $(".btn-danger").click(function(res){
-            alert("删除")
+        $(".create").on("click", function(){
+            $('#identifier').modal('show')
         })
-        $(".btn-warning").click(function(res){
-            alert("强杀")
+        $("tbody").on("click", " .btn-danger", function(){
+            jobName = $(this).attr('data')
+            $.post("/jobs/delete", {name: jobName}, function(result) {
+                if (result.errno === 200) {
+                    alert("删除成功")
+                } else {
+                    alert(result.msg)
+                }
+            })
         })
-        // $.ajax({
-        //     url: "/jobs/list",
-        //     dataType: "json",
-        //     success: function(res) {
-        //         if (res.errno != 200) {
-        //             return
-        //         }
-        //         var jobList = res.data
-        //         for (var i = 0; i < jobList.length; i++) {
-        //             var job = jobList[i]
-        //             var tr = $("<tr>")
-        //             tr.append($("<td>").html(job.name))
-        //             tr.append($("<td>").html(job.command))
-        //             tr.append($("<td>").html(job.cronExpr))
-        //             var toolBar = $("<div class='btn-toolbar'>").append('<button class="btn btn-info">编辑</button>')
-        //                                                         .append('<button class="btn btn-danger">删除</button>')
-        //                                                         .append('<button class="btn btn-warning">强杀</button>')
-        //                                                         .append('<button class="btn btn-warning">日志</button>')
-        //             tr.append($('<tr>')).append(toolBar)
-        //             $("tbody").append(tr)
-        //         }
-        //     }
-        // })
-        $.ajax({
-            url: "/jobs/save",
-            data: {"name": "job1", "command":"ooo", "cronExpr": "ddd"},
-            dataType: "json",
-            success: function(res) {
-                if (res.errno !== 200) {
-                    return
+        $("tbody").on("click", " .btn-warning", function(res){
+            jobName = $(this).attr('data')
+            $.post("/jobs/kill", {name: jobName}, function(result) {
+                if (result.errno === 200) {
+                    alert("杀死任务成功")
+                } else {
+                    alert(result.msg)
+                }
+            })
+        })
+        $(".subForm").click(function() {
+            var params = {
+                job: {
+                    name: $("#name").val(),
+                    command: $("#command").val(),
+                    cronExpr: $("#cronExpr").val()
                 }
             }
+            $.post("/jobs/save", params, function(result) {
+                if (result.errno === 200) {
+                    $('#identifier').modal('hide')
+                    alert("保存任务成功")
+                } else {
+                    alert(result.msg)
+                }
+            })
         })
     })
 </script>
