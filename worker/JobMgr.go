@@ -98,3 +98,8 @@ func (WorkMgr *WorkMgr) watchJobs() (err error) {
 	// 监听协程
 	return
 }
+
+func (WorkMgr *WorkMgr) CreateJobLock(jobName string) (jobLock *JobLock) {
+	jobLock = InitJobLock(jobName, WorkMgr.kv, WorkMgr.lease)
+	return
+}
