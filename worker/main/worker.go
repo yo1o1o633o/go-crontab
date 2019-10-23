@@ -2,18 +2,22 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"github.com/yo1o1o633o/go-crontab/worker"
+	"time"
 )
 var configFile string
 
 func initArgs() {
-	flag.StringVar(&configFile, "config", "E:/project/src/github.com/yo1o1o633o/go-crontab/worker/main/config.json", "加载config.json配置文件")
+	flag.StringVar(&configFile, "config", "F:/goProject/src/github.com/yo1o1o633o/go-crontab/worker/main/worker.json", "加载config.json配置文件")
 }
 
 func main() {
 	var (
 		err error
 	)
+	initArgs()
+
 	if err = worker.InitConfig(configFile); err != nil {
 		goto ERR
 	}
@@ -29,5 +33,9 @@ func main() {
 	if err = worker.InitMgr(); err != nil {
 		goto ERR
 	}
+	for {
+		time.Sleep(1)
+	}
 	ERR:
+		fmt.Println(err)
 }

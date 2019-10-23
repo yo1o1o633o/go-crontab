@@ -6,6 +6,7 @@ import (
 	"github.com/yo1o1o633o/go-crontab/common"
 	"go.etcd.io/etcd/clientv3"
 	"go.etcd.io/etcd/mvcc/mvccpb"
+	"log"
 	"time"
 )
 
@@ -24,22 +25,25 @@ func InitJobMgr() (err error) {
 		kv clientv3.KV
 		lease clientv3.Lease
 	)
-
+	log.Printf("初始化ETCD配置信息")
 	// 初始化配置
 	config = clientv3.Config{
 		Endpoints:   G_config.EtcdEndPoints,
 		DialTimeout: time.Duration(G_config.EtcdDialTimeout) * time.Millisecond,
 	}
-
+	log.Printf("建立ETCD连接")
 	// 建立连接
 	if client, err = clientv3.New(config); err != nil {
+		log.Printf("建立ETCD连接失败")
 		return
 	}
-
+	log.Printf("建立ETCD连接KV对象")
 	// 获取KV和lease
 	kv = clientv3.NewKV(client)
+	log.Printf("建立ETCD连接Lease对象")
 	lease = clientv3.NewLease(client)
 
+	log.Printf("全局保存ETCD对象信息")
 	G_jobMgr = &JobMgr{
 		client: client,
 		kv:     kv,
@@ -58,18 +62,23 @@ func (JobMgr *JobMgr) SaveJob(job *common.Job) (oldJob *common.Job, err error) {
 	)
 	// 保存到etcd中的任务的key
 	jobKey = common.JOB_SAVE_DIR + job.Name
+	log.Printf("将任务数据序列化未JSON结构")
 	// 将任务信息job结构体数据序列化成json
 	if jobValue, err = json.Marshal(job); err != nil {
+		log.Printf("将任务数据序列化未JSON结构, ERR: " + err.Error())
 		return
 	}
+	log.Printf("保存数据至ETCD")
 	// 保存到etcd, 同时获取旧值
 	if putResp, err = JobMgr.kv.Put(context.TODO(), jobKey, string(jobValue), clientv3.WithPrevKV()); err != nil {
+		log.Printf("保存数据至ETCD异常. ERR: " + err.Error())
 		return
 	}
 	// 保存成功返回旧值
 	if putResp.PrevKv != nil {
+		log.Printf("反序列化ETCD旧值")
 		if err = json.Unmarshal(putResp.PrevKv.Value, &oldJobObj); err != nil {
-			err = nil
+			log.Printf("反序列化ETCD旧值. ERR: " + err.Error())
 			return
 		}
 		oldJob = &oldJobObj

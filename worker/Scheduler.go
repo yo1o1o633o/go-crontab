@@ -16,7 +16,7 @@ var G_Scheduer *Scheduler
 
 func InitScheduler() (err error) {
 	G_Scheduer = &Scheduler{
-		jobEventChan:make(chan *common.JobEvent, 1000),
+		jobEventChan: make(chan *common.JobEvent, 1000),
 		jobPlanTable: make(map[string]*common.JobSchedulerPlan),
 		jobExecutingTable: make(map[string]*common.JobExecuteInfo),
 		jobResultChan: make(chan *common.JobExecuteResult, 1000),
@@ -122,7 +122,7 @@ func (Scheduler *Scheduler) TryScheduler() (schedulerAfter time.Duration) {
 		}
 	}
 	// 下次调度时间
-	schedulerAfter = (*nearTime).Sub(now)
+	//schedulerAfter = (nearTime).Sub(now)
 	return
 }
 

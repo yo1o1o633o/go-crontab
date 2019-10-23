@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/yo1o1o633o/go-crontab/common"
+	"log"
 	"net"
 	"net/http"
 	"strconv"
@@ -25,6 +26,7 @@ func InitApiServer() (err error){
 		staticDir http.Dir
 		staticHandler http.Handler
 	)
+	log.Printf("初始化路由组")
 	// 初始化路由
 	mux = http.NewServeMux()
 	mux.HandleFunc("/jobs/save", handleJobSave)
@@ -36,8 +38,10 @@ func InitApiServer() (err error){
 	staticHandler = http.FileServer(staticDir)
 	mux.Handle("/", http.StripPrefix("/", staticHandler))
 
+	log.Printf("初始化TCP服务监听")
 	// 启动TCP监听
 	if listener, err = net.Listen("tcp", ":" + strconv.Itoa(G_config.ApiPort)); err != nil {
+		log.Printf("初始化TCP服务监听.异常信息: " + err.Error())
 		return
 	}
 
@@ -51,6 +55,7 @@ func InitApiServer() (err error){
 	// 赋值单例
 	G_apiServer = &ApiServer{httpServer:httpServer}
 
+	log.Printf("启动TCP服务监听")
 	// 启动服务端
 	go httpServer.Serve(listener)
 	return
@@ -66,14 +71,19 @@ func handleJobSave(w http.ResponseWriter, r *http.Request) {
 		res []byte
 	)
 	// 解析入参
+	log.Printf("解析POST请求入参数据")
 	if err = r.ParseForm(); err != nil {
-		goto ERR
+		log.Printf("解析POST请求入参数据失败, ERR: " + err.Error())
+		return
 	}
 	// 获取入参job字段
 	postJob = r.PostForm.Get("job")
+
+	log.Printf("反序列化入参信息")
 	// 反序列化入参,入参是json格式, 反序列到job结构体中保存
 	if err = json.Unmarshal([]byte(postJob), &job); err != nil {
-		goto ERR
+		log.Printf("反序列化入参信息, ERR: " + err.Error())
+		return
 	}
 
 	// 将序列化后的结构体数据保存到etcd
