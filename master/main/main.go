@@ -16,7 +16,7 @@ func initLog() {
 }
 
 func initArgs() {
-	flag.StringVar(&configFile, "config", "F:/goProject/src/github.com/yo1o1o633o/go-crontab/master/main/config.json", "加载config.json配置文件")
+	flag.StringVar(&configFile, "config", "./src/github.com/yo1o1o633o/go-crontab/master/main/config.json", "加载config.json配置文件")
 }
 
 func initEnv() {

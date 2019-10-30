@@ -76,9 +76,11 @@ func handleJobSave(w http.ResponseWriter, r *http.Request) {
 		log.Printf("解析POST请求入参数据失败, ERR: " + err.Error())
 		return
 	}
+	fmt.Println(r.PostForm.Get("job"))
 	// 获取入参job字段
 	postJob = r.PostForm.Get("job")
 
+	fmt.Println(postJob)
 	log.Printf("反序列化入参信息")
 	// 反序列化入参,入参是json格式, 反序列到job结构体中保存
 	if err = json.Unmarshal([]byte(postJob), &job); err != nil {

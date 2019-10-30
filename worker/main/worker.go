@@ -9,7 +9,7 @@ import (
 var configFile string
 
 func initArgs() {
-	flag.StringVar(&configFile, "config", "F:/goProject/src/github.com/yo1o1o633o/go-crontab/worker/main/worker.json", "加载config.json配置文件")
+	flag.StringVar(&configFile, "config", "./src/github.com/yo1o1o633o/go-crontab/worker/main/worker.json", "加载config.json配置文件")
 }
 
 func main() {

@@ -57,15 +57,15 @@
                     <form>
                         <div class="form-group">
                             <label for="email">任务名称:</label>
-                            <input type="email" class="form-control" id="name">
+                            <input type="text" class="form-control" id="name">
                         </div>
                         <div class="form-group">
                             <label for="pwd">任务命令:</label>
-                            <input type="password" class="form-control" id="command">
+                            <input type="text" class="form-control" id="command">
                         </div>
                         <div class="form-group">
                             <label for="pwd">Shell命令:</label>
-                            <input type="password" class="form-control" id="cronExpr">
+                            <input type="text" class="form-control" id="cronExpr">
                         </div>
                     </form>
                 </div>
@@ -136,7 +136,7 @@
                     $('#identifier').modal('hide')
                     alert("保存任务成功")
                 } else {
-                    alert(result.msg)
+                    alert(result)
                 }
             })
         })
